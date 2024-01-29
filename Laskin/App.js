@@ -1,11 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { Alert, Button, StyleSheet, TextInput, View, Text } from 'react-native';
+import { Alert, Button, StyleSheet, TextInput, View, Text, FlatList } from 'react-native';
 
 export default function App() {
   const [text1, setText1] = useState("");
   const [text2, setText2] = useState("");
   const [result, setResult] = useState("");
+  const [data, setData] = useState([]);
 
   const onPress = (button) => {
     const input1 = parseFloat(text1);
@@ -16,23 +17,25 @@ export default function App() {
       return;
     }
 
-    let calculator ="";
+  let calculator = "";
+  let calculationResult = "";
 
     if (button === '+') {
-      calculator = input1 + input2;
+      calculator = `${input1} + ${input2}`;
+      calculationResult = `${input1 + input2}`;
     } else if (button === '-') {
-      calculator = input1 - input2;
+      calculator = `${input1} - ${input2}`;
+      calculationResult = `${input1 - input2}`;
     }
 
-    setResult(`Result: ${calculator}`);
-  }
+  setData([...data, { key: `${calculator} = ${calculationResult}`, result: calculationResult }]);
+  setResult(`Result: ${calculationResult}`);
 
+  };
 
-return (
-    
+  return (
     <View style={styles.container}>
-
-    <Text style={{ margin: 10 }}>{result}</Text>
+      <Text style={{ margin: 10 }}>{result}</Text>
 
       <TextInput
         style={{
@@ -58,28 +61,45 @@ return (
         keyboardType="numeric"
       />
 
-      <View style={styles.button}>
-        <Button title="+" onPress={() => onPress('+')} />
-        <View style={{ width: 25 }} />
-        <Button title="-" onPress={() => onPress('-')} />
+      <View style={styles.buttonContainer}>
+        <View style={styles.button}>
+          <Button title="+" onPress={() => onPress('+')} />
+        </View>
+        <View style={styles.button}>
+          <Button title="-" onPress={() => onPress('-')} />
+        </View>
       </View>
 
-
       <StatusBar style="auto" />
+
+      <View>
+        <Text>History</Text>
+      </View>
+
+      <FlatList
+        data={data}
+        renderItem={({ item }) => <Text>{item.key}</Text>}
+        keyExtractor={(item, index) => index.toString()}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    marginTop: '30%',
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  button: {
+  buttonContainer: {
     flexDirection: 'row',
-    width: 50,
+    width: '20%',
     margin: 10,
+  },
+  button: {
+    flex: 1,
+    marginRight:10
   },
 });
