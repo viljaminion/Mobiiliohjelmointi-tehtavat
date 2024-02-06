@@ -1,8 +1,24 @@
 import { StatusBar } from 'expo-status-bar';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
-import { Alert, Button, StyleSheet, TextInput, View, Text, FlatList } from 'react-native';
+import { Alert, Button, StyleSheet, TextInput, View, Text } from 'react-native';
+import History from './History';
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Calculator" component={Calculator} />
+        <Stack.Screen name="History" component={History} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
+function Calculator({ navigation }) {
   const [text1, setText1] = useState("");
   const [text2, setText2] = useState("");
   const [result, setResult] = useState("");
@@ -17,8 +33,8 @@ export default function App() {
       return;
     }
 
-  let calculator = "";
-  let calculationResult = "";
+    let calculator = "";
+    let calculationResult = "";
 
     if (button === '+') {
       calculator = `${input1} + ${input2}`;
@@ -28,9 +44,8 @@ export default function App() {
       calculationResult = `${input1 - input2}`;
     }
 
-  setData([...data, { key: `${calculator} = ${calculationResult}`, result: calculationResult }]);
-  setResult(`Result: ${calculationResult}`);
-
+    setData([...data, { calculator, calculationResult }]);
+    setResult(`Result: ${calculationResult}`);
   };
 
   return (
@@ -38,49 +53,26 @@ export default function App() {
       <Text style={{ margin: 10 }}>{result}</Text>
 
       <TextInput
-        style={{
-          borderColor: 'grey',
-          borderWidth: 1,
-          width: '50%',
-          fontSize: 14,
-        }}
+        style={styles.input}
         onChangeText={(input) => setText1(input)}
         value={text1}
         keyboardType="numeric"
       />
 
       <TextInput
-        style={{
-          borderColor: 'grey',
-          borderWidth: 1,
-          width: '50%',
-          fontSize: 14,
-        }}
+        style={styles.input}
         onChangeText={(input) => setText2(input)}
         value={text2}
         keyboardType="numeric"
       />
 
       <View style={styles.buttonContainer}>
-        <View style={styles.button}>
-          <Button title="+" onPress={() => onPress('+')} />
-        </View>
-        <View style={styles.button}>
-          <Button title="-" onPress={() => onPress('-')} />
-        </View>
+        <Button title="+" onPress={() => onPress('+')} />
+        <Button title="-" onPress={() => onPress('-')} />
+        <Button title="History" onPress={() => navigation.navigate('History', { data })} />
       </View>
 
       <StatusBar style="auto" />
-
-      <View>
-        <Text>History</Text>
-      </View>
-
-      <FlatList
-        data={data}
-        renderItem={({ item }) => <Text>{item.key}</Text>}
-        keyExtractor={(item, index) => index.toString()}
-      />
     </View>
   );
 }
@@ -93,13 +85,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  input: {
+    borderColor: 'grey',
+    borderWidth: 1,
+    width: '50%',
+    fontSize: 14,
+    marginVertical: 5,
+  },
   buttonContainer: {
     flexDirection: 'row',
-    width: '20%',
-    margin: 10,
-  },
-  button: {
-    flex: 1,
-    marginRight:10
+    width: '50%',
+    justifyContent: 'space-between',
+    marginTop: 10,
   },
 });
